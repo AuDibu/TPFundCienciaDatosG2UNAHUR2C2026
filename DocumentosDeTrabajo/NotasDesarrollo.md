@@ -33,6 +33,6 @@
   - salary_before_usd y salary_after_usd: convertir a float
   - validar conversión
 - Estrategia de subsanado de nulos:
-  - Analizar los job_roles y su correlación con industry, si los mismos pueden usarse para inferir la industria se usaran esos. Si no se puede inferir se llenara con "unknown"
+  - Los casos vacios de Industry se completaran con "unknown"
   - Obtener la mediana a nivel rol/industria y aplicar la misma a nulos de salary_after_usd, salary_before_usd y automation_risk_percent.
   - Validar cantidad de nulos post arreglo. 
