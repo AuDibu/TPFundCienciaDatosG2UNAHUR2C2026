@@ -41,3 +41,7 @@ pip-wheel-metadata/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Others
+report.txt
+docs/

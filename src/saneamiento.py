@@ -1,36 +1,36 @@
 import pandas as pd
-from IPython.display import display
+from src.outliers import calcular_limites_outliers
 
 
 def cargar_y_mostrar_dataset(csv_base_file_path):
     df = pd.read_csv(csv_base_file_path)
 
-    print("Info del DataFrame:")
-    display(df.info())
+    print("\nInfo del DataFrame:")
+    df.info()
 
-    print("Primeras filas del DataFrame:")
-    display(df.head())
-    print("Últimas filas del DataFrame:")
-    display(df.tail())
-    print("Muestra aleatoria de 10 filas:")
-    display(df.sample(n=10))
+    print("\nPrimeras filas del DataFrame:")
+    print(df.head().to_string(index=False))
+    print("\nÚltimas filas del DataFrame:")
+    print(df.tail().to_string(index=False))
+    print("\nMuestra aleatoria de 10 filas:")
+    print(df.sample(n=10).to_string(index=False))
 
     return df
 
 
 def analizar_vacios_y_duplicados(df):
-    print("Conteo de valores nulos por columna:")
-    display(df.isnull().sum())
+    print("\nConteo de valores nulos por columna:")
+    print(df.isnull().sum().to_string())
 
-    print("Número de filas repetidas:", df.duplicated().sum())
+    print("\nNúmero de filas repetidas:", df.duplicated().sum())
 
 
 def identificar_inconsistencias_categoricas(df):
     object_columns = df.select_dtypes(include=['object']).columns
 
     for col in object_columns:
-        print(f"Distribución de categorias para {col}:")
-        display(df[col].value_counts(normalize=True, sort=False).sort_index())
+        print(f"\nTop 5 de categorías por frecuencia para {col}:")
+        print(df[col].value_counts(normalize=True).head(5).to_string())
 
 
 def limpiar_dataset(df):
@@ -49,15 +49,18 @@ def limpiar_dataset(df):
     muestra_df_post_conversion = df.isnull().sum().copy()
 
     if (muestra_df_pre_conversion.equals(muestra_df_post_conversion)):
-        print("Se mantiene la cantidad de nulos pre y post conversión.")
+        print("\nSe mantiene la cantidad de nulos pre y post conversión.")
     else:
-        print("La conversión genero nulos.")
+        print("\nLa conversión genero nulos.")
 
     df['industry'] = df['industry'].fillna('unknown')
 
     df['automation_risk_percent'] = df['automation_risk_percent'].fillna(
         df.groupby(['job_role', 'industry'])['automation_risk_percent'].transform('mean')
     )
+
+    for col in ['salary_before_usd', 'salary_after_usd']:
+        df[col] = df[col].replace(0, float('nan'))
 
     df['salary_before_usd'] = df['salary_before_usd'].fillna(
         df.groupby(['job_role', 'industry'])['salary_before_usd'].transform('median')
@@ -70,9 +73,9 @@ def limpiar_dataset(df):
     nulos_restantes = df.isnull().sum().sum()
 
     if nulos_restantes == 0:
-        print("Limpieza completa.")
+        print("\nLimpieza completa.")
     else:
-        print(f"Restan {nulos_restantes} valores nulos.")
+        print(f"\nRestan {nulos_restantes} valores nulos.")
 
     return df
 
@@ -81,13 +84,10 @@ def filtrar_outliers(df):
     df_outliers = df.copy()
 
     for col in ['salary_before_usd', 'salary_after_usd']:
-        Q1_grupal = df.groupby(['job_role', 'country'])[col].transform('quantile', q=0.25)
-        Q3_grupal = df.groupby(['job_role', 'country'])[col].transform('quantile', q=0.75)
-
-        IQR_grupal = Q3_grupal - Q1_grupal
-        limite_inferior = Q1_grupal - 1.5 * IQR_grupal
-        limite_superior = Q3_grupal + 1.5 * IQR_grupal
-
-        df = df[(df[col] >= limite_inferior) & (df[col] <= limite_superior)]
+        limites = calcular_limites_outliers(df, col)
+        df = df[
+            (df[col] >= limites['limite_inf_aplicado'])
+            & (df[col] <= limites['limite_sup_aplicado'])
+        ]
 
     return df, df_outliers
