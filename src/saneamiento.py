@@ -3,7 +3,9 @@ from src.outliers import calcular_limites_outliers
 
 
 def cargar_y_mostrar_dataset(csv_base_file_path):
+    print(f"\nSe carga la fuente de datos desde: {csv_base_file_path}")
     df = pd.read_csv(csv_base_file_path)
+    print(f"El dataset contiene {len(df)} filas y {len(df.columns)} columnas.")
 
     print("\nInfo del DataFrame:")
     df.info()
@@ -19,7 +21,8 @@ def cargar_y_mostrar_dataset(csv_base_file_path):
 
 
 def analizar_vacios_y_duplicados(df):
-    print("\nConteo de valores nulos por columna:")
+    print("\nSe revisan los valores faltantes y las filas repetidas.")
+    print("Conteo de valores nulos por columna:")
     print(df.isnull().sum().to_string())
 
     print("\nNúmero de filas repetidas:", df.duplicated().sum())
@@ -27,6 +30,7 @@ def analizar_vacios_y_duplicados(df):
 
 def identificar_inconsistencias_categoricas(df):
     object_columns = df.select_dtypes(include=['object']).columns
+    print("\nSe revisan las categorías de las columnas de texto. Para facilitar la lectura, se muestra el top 5 por frecuencia.")
 
     for col in object_columns:
         print(f"\nTop 5 de categorías por frecuencia para {col}:")
@@ -34,12 +38,16 @@ def identificar_inconsistencias_categoricas(df):
 
 
 def limpiar_dataset(df):
+    filas_iniciales = len(df)
     df = df.drop_duplicates()
+    print(f"\nSe eliminaron {filas_iniciales - len(df)} filas repetidas.")
 
+    print("Se normalizan los nombres de las industrias para unificar mayúsculas, minúsculas y espacios.")
     df['industry'] = df['industry'].str.lower().str.strip()
 
     muestra_df_pre_conversion = df.isnull().sum().copy()
 
+    print("Se limpian los símbolos de los salarios y se convierten sus valores a formato numérico.")
     for col in ['salary_before_usd', 'salary_after_usd']:
         df[col] = df[col].str.replace(r'[^\d.]+', '', regex=True).astype(str)
 
@@ -53,15 +61,22 @@ def limpiar_dataset(df):
     else:
         print("\nLa conversión genero nulos.")
 
+    faltantes_industry = int(df['industry'].isna().sum())
+    print(f"Se completan {faltantes_industry} industrias faltantes con 'unknown'.")
     df['industry'] = df['industry'].fillna('unknown')
 
+    faltantes_riesgo = int(df['automation_risk_percent'].isna().sum())
+    print(f"Se imputan {faltantes_riesgo} riesgos de automatización faltantes con el promedio por puesto e industria.")
     df['automation_risk_percent'] = df['automation_risk_percent'].fillna(
         df.groupby(['job_role', 'industry'])['automation_risk_percent'].transform('mean')
     )
 
     for col in ['salary_before_usd', 'salary_after_usd']:
+        ceros = int(df[col].eq(0).sum())
+        print(f"Se convierten {ceros} ceros de {col} en valores faltantes para poder imputarlos.")
         df[col] = df[col].replace(0, float('nan'))
 
+    print("Se imputan los salarios faltantes con la mediana del mismo puesto y la misma industria.")
     df['salary_before_usd'] = df['salary_before_usd'].fillna(
         df.groupby(['job_role', 'industry'])['salary_before_usd'].transform('median')
     )
@@ -81,13 +96,20 @@ def limpiar_dataset(df):
 
 
 def filtrar_outliers(df):
+    filas_iniciales = len(df)
     df_outliers = df.copy()
+    print("\nSe conserva una copia del dataset para revisar los salarios atípicos antes de filtrarlos.")
 
     for col in ['salary_before_usd', 'salary_after_usd']:
+        filas_antes = len(df)
+        print(f"Se calculan los límites de Tukey por puesto y país para {col}.")
         limites = calcular_limites_outliers(df, col)
         df = df[
             (df[col] >= limites['limite_inf_aplicado'])
             & (df[col] <= limites['limite_sup_aplicado'])
         ]
+        print(f"Para {col}, se excluyeron {filas_antes - len(df)} filas fuera de los límites.")
+
+    print(f"El filtrado conserva {len(df)} de las {filas_iniciales} filas iniciales.")
 
     return df, df_outliers

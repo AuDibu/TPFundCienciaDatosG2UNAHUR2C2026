@@ -3,7 +3,10 @@ from src.outliers import calcular_limites_outliers
 
 
 def calcular_volatilidad_ingresos(df):
+    print("\nSe compara la variación de los salarios antes y después de la IA.")
+    print("Para observar puestos similares dentro de cada mercado, se agrupa por puesto y país.")
     grupos = df.groupby(['job_role', 'country'])
+    print(f"Se calculan rango y varianza para {grupos.ngroups} grupos.")
 
     varianzas = grupos[['salary_before_usd', 'salary_after_usd']].var()
     maximos = grupos[['salary_before_usd', 'salary_after_usd']].max()
@@ -43,10 +46,12 @@ def calcular_volatilidad_ingresos(df):
 
 
 def analizar_brecha_habilidades(df):
+    print("\nSe calcula el promedio de skill_gap_index para cada país.")
     brecha_por_pais = df.groupby('country')['skill_gap_index'].mean().sort_values(ascending=False)
 
     print("\nPromedio de Skill Gap Index por País")
     print(brecha_por_pais.to_string())
+    print(f"\nSe compararon {len(brecha_por_pais)} países.")
 
     pais_critico = brecha_por_pais.idxmax()
     valor_critico = brecha_por_pais.max()
@@ -55,6 +60,8 @@ def analizar_brecha_habilidades(df):
 
 
 def detectar_outliers(df_outliers):
+    print("\nSe buscan salarios que se alejan del rango habitual de su puesto y país.")
+    print("Para definir los límites se usa 1,5 veces el rango intercuartílico, conocido como criterio de Tukey.")
     for col in ['salary_before_usd', 'salary_after_usd']:
         print(f"\nAnálisis de outliers agrupados para {col}")
 
