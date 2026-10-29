@@ -1,9 +1,8 @@
 from contextlib import redirect_stdout
 from io import StringIO
-from pathlib import Path
 import sys
 
-from src.configuracion import RUTA_CSV
+from src.configuracion import RUTA_CSV, RUTA_OUTPUT
 from src.saneamiento import (
     analizar_vacios_y_duplicados,
     cargar_y_mostrar_dataset,
@@ -15,13 +14,15 @@ from src.eda import (
     analizar_brecha_habilidades,
     calcular_volatilidad_ingresos,
     detectar_outliers,
+    generar_visualizaciones_fase_iii,
 )
 
 
 def main():
     salida = StringIO()
     stdout_original = sys.stdout
-    ruta_reporte = Path(__file__).resolve().with_name("report.txt")
+    RUTA_OUTPUT.mkdir(parents=True, exist_ok=True)
+    ruta_reporte = RUTA_OUTPUT / "report.txt"
 
     try:
         with redirect_stdout(salida):
@@ -43,44 +44,30 @@ def main():
 # - **Normalización**: Traduzcan y estandaricen los campos para asegurar una lectura fluida en español.
 """)
 
+            print("""\n# #### Carga del dataset""")
             df = cargar_y_mostrar_dataset(RUTA_CSV)
-            print()
+            print("""\n# #### Auditoría de Calidad Inicial""")
             analizar_vacios_y_duplicados(df)
-            print()
+            print("""\n# #### Identificación de inconsistencias categóricas""")
             identificar_inconsistencias_categoricas(df)
             print()
 
             print("""\n# #### Limpieza inicial del dataset
 #
-# *Puntos a atacar:*
+# *Estrategia de limpieza:*
 #
 # - Repetidos:
-#   - Detectados:
-#     - 50 filas repetidas
-#   - Estrategia:
 #     - Se dejara una fila única por cada repetido
 # - Conflictos en columnas categóricas:
-#   - Detectados:
-#     - Industry presenta inconsistencias en su uso de mayúsculas y minúsculas
-#     - Salary_before_usd y salary_after_usd: floats que estan en formato string y presentan uso inconsistente del carácter "$"
-#   - Estrategia:
+#     - A todas las columnas string se le aplicara un trim
 #     - Industry sera pasado a solo minúscula de manera general
 #     - Salary_before_usd y salary_after_usd seran convertidos a float
 # - Vacios:
-#   - Detectados:
-#     - salary_after_usd: 754
-#     - salary_before_usd: 753
-#     - automation_risk_percent: 752
-#     - industry: 751
-#   - Estrategia:
 #     - Los casos vacios de Industry se completaran con "unknown"
 #     - Los vacios de automation_risk_percent seran completados analizando el promedio a nivel job_role/industry.
 #     - Los vacios de salary_before_usd y salary_after_usd seran completados analizando la mediana a nivel job_role/industry.
 #       - Se usa la mediana ya que los sueldos muy altos o muy bajos harian del promedio un valor poco representativo.
 #
-# Limpieza de duplicados
-# Saneamiento de strings
-# Conversión de columnas de salario a tipo numérico
 """)
             df = limpiar_dataset(df)
             print()
@@ -128,7 +115,16 @@ def main():
 # - **Gráfico de Evolución**: Tendencia anual del salario promedio en finanzas desde 2020 a 2026.
 # - **Gráfico de Distribución (Pie/Pie Chart)**: Distribución de los roles según su categoría de riesgo de automatización.
 # - **Heatmap o Barras Geográficas**: Comparativa del `ai_adoption_level` por país para este sector.
+""")
+            rutas_graficos = generar_visualizaciones_fase_iii(df, RUTA_OUTPUT)
+            if rutas_graficos:
+                print("\nGráficos generados en data/output:")
+                for ruta in rutas_graficos:
+                    print(f"- {ruta.name}")
+            else:
+                print("\nNo se generaron gráficos en Fase III.")
 
+            print("""
 # ### 6. Fase IV: Reflexión Crítica (Anti-LLM)
 # *Responda basándose estrictamente en los hallazgos de su procesamiento de datos:*
 # - ¿Existe evidencia de que la IA esté "empobreciendo" los roles tradicionales de finanzas?

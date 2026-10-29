@@ -44,4 +44,6 @@ Desktop.ini
 
 # Others
 report.txt
+data/output/*
+!data/output/.gitkeep
 docs/
