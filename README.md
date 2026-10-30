@@ -53,6 +53,7 @@ El programa ejecuta estas etapas:
 3. **Outliers:** calcula límites de Tukey (1,5 × IQR) por puesto y país para los salarios. Conserva una copia previa al filtrado para detallar los valores atípicos en el informe y excluye esos registros del análisis posterior.
 4. **Análisis exploratorio:** filtra los datos a la industria `finance`, calcula la volatilidad de ingresos por puesto y país, compara el índice de brecha de habilidades por país e informa los salarios atípicos.
 5. **Visualización:** genera gráficos sobre salarios promedio por año, categorías de riesgo de automatización y adopción promedio de IA por país.
+6. **Reflexión crítica:** compara la variación porcentual del salario promedio post IA entre 2020 y 2026 para *Accountant* y *Financial Analyst*, por país; además, calcula los promedios de `ai_replacement_score` y `automation_risk_percent` por rangos de 25 puntos de factibilidad de trabajo remoto.
 
 ## Archivos generados
 
@@ -79,15 +80,4 @@ src/
   saneamiento.py                Auditoría, limpieza e imputación
   outliers.py                   Límites de Tukey
   eda.py                        Análisis exploratorio y visualizaciones
-docs/
-  consigna_grupo_2.md           Consigna del trabajo práctico
-  NotasDesarrollo.md            Bitácora de saneamiento
-  Sumarizado.md                 Resumen del flujo de trabajo
-  TP-FundamentosCienciasDatos.ipynb
-  TPExtracto.py
-  diccionario_variables_ai_job_replacement.pdf
 ```
-
-## Documentación de referencia
-
-Para consultar la consigna, las notas de limpieza y el diccionario de variables, ver la carpeta [`docs/`](docs/).

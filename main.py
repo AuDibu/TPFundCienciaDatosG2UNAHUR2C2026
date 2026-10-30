@@ -12,6 +12,8 @@ from src.saneamiento import (
 )
 from src.eda import (
     analizar_brecha_habilidades,
+    analizar_riesgo_por_factibilidad_remota,
+    analizar_variacion_salarial_roles_tradicionales,
     calcular_volatilidad_ingresos,
     detectar_outliers,
     generar_visualizaciones_fase_iii,
@@ -130,11 +132,19 @@ def main():
 # - ¿Existe evidencia de que la IA esté "empobreciendo" los roles tradicionales de finanzas?
 # - Según sus datos, ¿la factibilidad de trabajo remoto protege o expone más al trabajador financiero frente al reemplazo por IA?
 
-# ### 7. Requerimientos de Entrega y Defensa
-# 1.  **Informe Profesional**: PDF o Markdown con resumen ejecutivo, bitácora de saneamiento e interpretación de resultados.
-# 2.  **Código Fuente**: Script o Notebook estructurado, comentado y reproducible.
-# 3.  **Defensa Oral**: Justificación técnica de la limpieza e interpretación de las visualizaciones ante el curso.
+# #### Variación salarial en roles tradicionales
+#
+# Se compara el salario promedio post IA de 2020 y 2026, segmentado por puesto y país.
 """)
+            analizar_variacion_salarial_roles_tradicionales(df)
+
+            print("""
+# #### Riesgo según factibilidad de trabajo remoto
+#
+# Se agrupan los registros en rangos de 25 puntos de remote_feasibility_score y se calcula el promedio de los indicadores solicitados.
+""")
+            analizar_riesgo_por_factibilidad_remota(df)
+
     finally:
         contenido_reporte = salida.getvalue()
         ruta_reporte.write_text(contenido_reporte, encoding="utf-8")

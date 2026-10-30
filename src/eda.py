@@ -1,7 +1,66 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from pathlib import Path
 from src.outliers import calcular_limites_outliers
+
+
+def analizar_variacion_salarial_roles_tradicionales(df):
+    print("\nSe compara el salario promedio post IA de 2020 y 2026.")
+    print("Se agrupa por puesto y país para los roles Accountant y Financial Analyst.")
+
+    roles_tradicionales = ['Accountant', 'Financial Analyst']
+    salarios = (
+        df.loc[
+            df['job_role'].isin(roles_tradicionales)
+            & df['year'].isin([2020, 2026])
+        ]
+        .groupby(['job_role', 'country', 'year'])['salary_after_usd']
+        .mean()
+        .unstack('year')
+        .reindex(columns=[2020, 2026])
+        .rename(columns={
+            2020: 'salario_promedio_2020_usd',
+            2026: 'salario_promedio_2026_usd',
+        })
+    )
+
+    salarios['variacion_porcentual'] = (
+        (salarios['salario_promedio_2026_usd'] - salarios['salario_promedio_2020_usd'])
+        / salarios['salario_promedio_2020_usd'].replace(0, np.nan)
+        * 100
+    )
+    tabla_salarios = salarios.reset_index().sort_values(['job_role', 'country'])
+
+    print("\nVariación porcentual del salario por puesto y país")
+    print("Los grupos sin registros en 2020 o 2026 muestran NaN en la variación.")
+    print(tabla_salarios.to_string(index=False, float_format=lambda valor: f'{valor:.2f}'))
+
+
+def analizar_riesgo_por_factibilidad_remota(df):
+    print("\nSe agrupan los registros según la factibilidad de trabajo remoto.")
+    print("Para cada rango se calcula el promedio de ai_replacement_score y automation_risk_percent.")
+
+    rangos = ['0-25', '25-50', '50-75', '75-100']
+    df_con_rangos = df.copy()
+    df_con_rangos['rango_factibilidad_remota'] = pd.cut(
+        df_con_rangos['remote_feasibility_score'],
+        bins=[0, 25, 50, 75, 100],
+        labels=rangos,
+        include_lowest=True,
+    )
+    tabla_riesgo = (
+        df_con_rangos
+        .groupby('rango_factibilidad_remota', observed=False)[
+            ['ai_replacement_score', 'automation_risk_percent']
+        ]
+        .mean()
+        .reindex(rangos)
+        .reset_index()
+    )
+
+    print("\nPromedio de indicadores por rango de factibilidad remota")
+    print(tabla_riesgo.to_string(index=False, float_format=lambda valor: f'{valor:.2f}'))
 
 
 def _construir_tabla_volatilidad(grupos):
