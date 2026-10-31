@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 
 
 def _preparar_salario_promedio_anual(df):
+    """Resume los datos para el gráfico de evolución: salario promedio post IA por año.
+
+    Es el paso "agregar antes de graficar": en vez de dibujar miles de registros,
+    se reduce cada año a un único valor representativo. sort_index ordena los años
+    cronológicamente para que la línea no se dibuje desordenada.
+    """
     return (
         df.groupby('year')['salary_after_usd']
         .mean()
@@ -13,6 +19,11 @@ def _preparar_salario_promedio_anual(df):
 
 
 def _guardar_grafico_evolucion_salarios(tabla_anual, ruta_output):
+    """Gráfico de líneas: tendencia del salario promedio entre 2020 y 2026.
+
+    El gráfico de líneas es el adecuado para series temporales porque muestra
+    la dirección del cambio (sube, baja o se mantiene) a lo largo del tiempo.
+    """
     ruta_archivo = Path(ruta_output) / 'evolucion_salarial_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -38,16 +49,23 @@ def _guardar_grafico_evolucion_salarios(tabla_anual, ruta_output):
     ax.legend(fontsize=11)
     fig.tight_layout()
     fig.savefig(ruta_archivo, dpi=150)
+    # Se cierra la figura para liberar memoria al generar varios gráficos seguidos.
     plt.close(fig)
 
     return ruta_archivo
 
 
 def _preparar_distribucion_riesgo_automatizacion(df):
+    """Cuenta cuántos registros hay en cada categoría de riesgo de automatización."""
     return df['automation_risk_category'].value_counts().sort_values(ascending=False)
 
 
 def _guardar_grafico_distribucion_riesgo(distribucion_riesgo, ruta_output):
+    """Gráfico de torta: qué proporción del sector cae en cada categoría de riesgo.
+
+    La torta sirve para mostrar partes de un total (los porcentajes suman 100%);
+    funciona bien con pocas categorías, como las de riesgo (bajo, medio, alto).
+    """
     ruta_archivo = Path(ruta_output) / 'distribucion_riesgo_automatizacion_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -72,6 +90,7 @@ def _guardar_grafico_distribucion_riesgo(distribucion_riesgo, ruta_output):
 
 
 def _preparar_adopcion_ia_por_pais(df):
+    """Calcula el nivel promedio de adopción de IA por país, de mayor a menor."""
     return (
         df.groupby('country')['ai_adoption_level']
         .mean()
@@ -80,6 +99,12 @@ def _preparar_adopcion_ia_por_pais(df):
 
 
 def _guardar_grafico_barras_adopcion(adopcion_por_pais, ruta_output):
+    """Gráfico de barras: compara el nivel de adopción de IA entre países.
+
+    Las barras permiten comparar magnitudes entre categorías (países) a simple
+    vista; ordenarlas de mayor a menor y rotular el valor sobre cada barra
+    facilita leer el ranking sin tener que estimar sobre el eje.
+    """
     ruta_archivo = Path(ruta_output) / 'adopcion_ia_por_pais_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -102,6 +127,7 @@ def _guardar_grafico_barras_adopcion(adopcion_por_pais, ruta_output):
     plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
     ax.grid(axis='y', linestyle='--', alpha=0.6)
 
+    # Se escribe el valor numérico encima de cada barra para leerlo sin estimar sobre el eje.
     for barra in barras:
         altura = barra.get_height()
         ax.text(
@@ -121,6 +147,14 @@ def _guardar_grafico_barras_adopcion(adopcion_por_pais, ruta_output):
 
 
 def generar_visualizaciones_fase_iii(df, ruta_output):
+    """Genera los tres gráficos de la Fase III y devuelve las rutas de los archivos creados.
+
+    Cada gráfico sigue el mismo esquema: (1) preparar/agregar los datos, (2) dibujar
+    y guardar la imagen. Si no hay datos para alguno, se informa y se continúa con
+    el resto en lugar de fallar, para que el reporte siempre se complete.
+    Los tres gráficos responden a los puntos de la consigna: evolución salarial,
+    distribución por riesgo de automatización y adopción de IA por país.
+    """
     rutas_generadas = []
 
     print('\nSe generan visualizaciones de Fase III para el sector Finanzas.')
