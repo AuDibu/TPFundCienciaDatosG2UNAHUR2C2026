@@ -12,11 +12,14 @@ from src.saneamiento import (
 )
 from src.eda import (
     analizar_brecha_habilidades,
-    analizar_riesgo_por_factibilidad_remota,
-    analizar_variacion_salarial_por_pais,
     calcular_volatilidad_ingresos,
     detectar_outliers,
-    generar_visualizaciones_fase_iii,
+)
+from src.visualizaciones import generar_visualizaciones_fase_iii
+from src.reflexion import (
+    analizar_reemplazo_ia_por_factibilidad_remota,
+    analizar_riesgo_automatizacion_por_factibilidad_remota,
+    analizar_variacion_salarial_por_pais,
 )
 
 
@@ -143,18 +146,29 @@ def main():
 # una disminución porcentual del salario entre 2020 y 2026 en la mayoría de los casos
 # Se aprecian casos donde hubo una evolución positiva del salario, así como también una falta de uniformidad
 # en la disminución salarial.
-# Se podria relacionar la apareción de los LLM con una disminución de los salarios, sin embargo
-# es importante recordar que es solo uno de los multiples factores presentes en la actualidad.
+# Se podria relacionar la apareción de los LLM con una disminución de los salarios y el costo propio de la
+# tecnología lleva a un redireccionamiento de recursos destinado a la misma además de una mayor demanda de productividad
+# hacia los dev al contar con esta herraminta
+# Sin embargo, si bien la disminución del salario es apreciable es importante recordar que 
+# es solo uno de los multiples factores presentes en la actualidad, por lo que no se le podria atribuir la totalidad de la culpa.
 """)
             
             print("""
 # #### Riesgo según factibilidad de trabajo remoto
 #
-# Se agrupan los registros en rangos de 25 puntos de remote_feasibility_score y se calcula el promedio de los indicadores de riesgo.
+# Se agrupan los registros en rangos de 25 puntos de remote_feasibility_score. Para cada indicador se comparan los promedios de 2020 y 2026 y se calcula su variación porcentual.
 """)
-            analizar_riesgo_por_factibilidad_remota(df, 2020)
-            analizar_riesgo_por_factibilidad_remota(df, 2026)
+            analizar_reemplazo_ia_por_factibilidad_remota(df)
+            analizar_riesgo_automatizacion_por_factibilidad_remota(df)
 
+            print("""
+# Tras analizar los datos, tanto para ai_replacement_score como para automation_risk_percent
+# se observa una disminución en ambos indicadores de riesgo para la mayoría de brackets de factibilidad remota.
+# Sin embargo se aprecia un aumento en ambos para el bracket de 25-50, lo que indica mayor vulnerabilidad en estos puestos.
+# En general se podria decir que aquellos puestos completamente presenciales y aquellos que apenas requieren de la presencia
+# del personal quedaron más protegidos.
+""")
+            
     finally:
         contenido_reporte = salida.getvalue()
         ruta_reporte.write_text(contenido_reporte, encoding="utf-8")
