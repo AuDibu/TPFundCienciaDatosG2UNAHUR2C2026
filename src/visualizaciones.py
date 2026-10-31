@@ -19,16 +19,23 @@ def _guardar_grafico_evolucion_salarios(tabla_anual, ruta_output):
     ax.plot(
         tabla_anual['year'],
         tabla_anual['salary_after_usd'],
-        marker='o',
+        marker='s',
+        linestyle='--',
+        color='darkorange',
         linewidth=2,
-        label='Salario promedio post IA',
+        label='Salario Después de la IA',
     )
 
-    ax.set_title('Evolución anual del salario promedio post IA en Finanzas')
-    ax.set_xlabel('Año')
-    ax.set_ylabel('Salario promedio (USD)')
-    ax.grid(alpha=0.3)
-    ax.legend()
+    ax.set_title(
+        'Evolución Anual del Salario Promedio en Finanzas (2020-2026)',
+        fontsize=14,
+        fontweight='bold',
+    )
+    ax.set_xlabel('Año', fontsize=12)
+    ax.set_ylabel('Salario Promedio (USD)', fontsize=12)
+    ax.grid(True, linestyle='--', alpha=0.6)
+    ax.set_xticks(tabla_anual['year'])
+    ax.legend(fontsize=11)
     fig.tight_layout()
     fig.savefig(ruta_archivo, dpi=150)
     plt.close(fig)
@@ -51,7 +58,11 @@ def _guardar_grafico_distribucion_riesgo(distribucion_riesgo, ruta_output):
         startangle=90,
         wedgeprops={'edgecolor': 'white'},
     )
-    ax.set_title('Distribución de roles por riesgo de automatización')
+    ax.set_title(
+        'Distribución de Roles por Riesgo de Automatización',
+        fontsize=14,
+        fontweight='bold',
+    )
     ax.axis('equal')
     fig.tight_layout()
     fig.savefig(ruta_archivo, dpi=150)
@@ -72,12 +83,36 @@ def _guardar_grafico_barras_adopcion(adopcion_por_pais, ruta_output):
     ruta_archivo = Path(ruta_output) / 'adopcion_ia_por_pais_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(12, 6))
-    ax.bar(adopcion_por_pais.index, adopcion_por_pais.values)
-    ax.set_title('Adopción promedio de IA por país en Finanzas')
-    ax.set_xlabel('País')
-    ax.set_ylabel('AI Adoption Level (promedio)')
-    ax.tick_params(axis='x', rotation=45)
-    ax.grid(axis='y', alpha=0.3)
+    barras = ax.bar(
+        adopcion_por_pais.index,
+        adopcion_por_pais.values,
+        color='teal',
+        edgecolor='black',
+        alpha=0.85,
+    )
+
+    ax.set_title(
+        'Comparativa del Nivel de Adopción de IA por País en el Sector Finanzas',
+        fontsize=14,
+        fontweight='bold',
+        pad=15,
+    )
+    ax.set_xlabel('País', fontsize=12)
+    ax.set_ylabel('Nivel Promedio de Adopción de IA', fontsize=12)
+    plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+    ax.grid(axis='y', linestyle='--', alpha=0.6)
+
+    for barra in barras:
+        altura = barra.get_height()
+        ax.text(
+            barra.get_x() + barra.get_width() / 2.0,
+            altura + 0.5,
+            f'{altura:.1f}',
+            ha='center',
+            va='bottom',
+            fontsize=10,
+        )
+
     fig.tight_layout()
     fig.savefig(ruta_archivo, dpi=150)
     plt.close(fig)
