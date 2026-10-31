@@ -13,7 +13,7 @@ from src.saneamiento import (
 from src.eda import (
     analizar_brecha_habilidades,
     analizar_riesgo_por_factibilidad_remota,
-    analizar_variacion_salarial_roles_tradicionales,
+    analizar_variacion_salarial_por_pais,
     calcular_volatilidad_ingresos,
     detectar_outliers,
     generar_visualizaciones_fase_iii,
@@ -132,18 +132,28 @@ def main():
 # - ¿Existe evidencia de que la IA esté "empobreciendo" los roles tradicionales de finanzas?
 # - Según sus datos, ¿la factibilidad de trabajo remoto protege o expone más al trabajador financiero frente al reemplazo por IA?
 
-# #### Variación salarial en roles tradicionales
+# #### Variación salarial por país
 #
-# Se compara el salario promedio post IA de 2020 y 2026, segmentado por puesto y país.
+# Se compara el salario mediano post IA de 2020 y 2026 por país.
 """)
-            analizar_variacion_salarial_roles_tradicionales(df)
+            analizar_variacion_salarial_por_pais(df)
 
+            print("""
+# Analizando los salarios entre los distintos países podemos apreciar
+# una disminución porcentual del salario entre 2020 y 2026 en la mayoría de los casos
+# Se aprecian casos donde hubo una evolución positiva del salario, así como también una falta de uniformidad
+# en la disminución salarial.
+# Se podria relacionar la apareción de los LLM con una disminución de los salarios, sin embargo
+# es importante recordar que es solo uno de los multiples factores presentes en la actualidad.
+""")
+            
             print("""
 # #### Riesgo según factibilidad de trabajo remoto
 #
-# Se agrupan los registros en rangos de 25 puntos de remote_feasibility_score y se calcula el promedio de los indicadores solicitados.
+# Se agrupan los registros en rangos de 25 puntos de remote_feasibility_score y se calcula el promedio de los indicadores de riesgo.
 """)
-            analizar_riesgo_por_factibilidad_remota(df)
+            analizar_riesgo_por_factibilidad_remota(df, 2020)
+            analizar_riesgo_por_factibilidad_remota(df, 2026)
 
     finally:
         contenido_reporte = salida.getvalue()

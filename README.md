@@ -53,7 +53,7 @@ El programa ejecuta estas etapas:
 3. **Outliers:** calcula límites de Tukey (1,5 × IQR) por puesto y país para los salarios. Conserva una copia previa al filtrado para detallar los valores atípicos en el informe y excluye esos registros del análisis posterior.
 4. **Análisis exploratorio:** filtra los datos a la industria `finance`, calcula la volatilidad de ingresos por puesto y país, compara el índice de brecha de habilidades por país e informa los salarios atípicos.
 5. **Visualización:** genera gráficos sobre salarios promedio por año, categorías de riesgo de automatización y adopción promedio de IA por país.
-6. **Reflexión crítica:** compara la variación porcentual del salario promedio post IA entre 2020 y 2026 para *Accountant* y *Financial Analyst*, por país; además, calcula los promedios de `ai_replacement_score` y `automation_risk_percent` por rangos de 25 puntos de factibilidad de trabajo remoto.
+6. **Reflexión crítica:** compara la variación porcentual del salario mediano post IA entre 2020 y 2026 por país, incluyendo todos los roles; además, calcula los promedios de `ai_replacement_score` y `automation_risk_percent` por rangos de 25 puntos de factibilidad de trabajo remoto.
 
 ## Archivos generados
 
