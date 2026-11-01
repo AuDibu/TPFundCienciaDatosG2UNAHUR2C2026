@@ -38,7 +38,7 @@ def analizar_vacios_y_duplicados(df):
     """
     print("\nSe revisan los valores faltantes y las filas repetidas.")
     print("Conteo de valores nulos por columna:")
-    print(df.isnull().sum().to_string(index=False))
+    print(df.isnull().sum().to_string())
 
     print("\nNúmero de filas repetidas:", df.duplicated().sum())
 
@@ -57,13 +57,13 @@ def identificar_inconsistencias_categoricas(df):
 
     for col in object_columns:
         print(f"\nFrecuencia de categorías para {col}:")
-        print(df[col].value_counts(normalize=True).to_string(index=False))
+        print(df[col].value_counts(normalize=True).to_string())
 
     print("\nSe analiza el primer carácter de salary_before_usd y salary_after_usd para detectar formatos inconsistentes.")
     for col in ['salary_before_usd', 'salary_after_usd']:
         primer_caracter = df[col].astype('string').str.strip().str[0].fillna('NA')
         print(f"\nConteo de registros por primer carácter en {col}:")
-        print(primer_caracter.value_counts(dropna=False).to_string(index=False))
+        print(primer_caracter.value_counts(dropna=False).to_string())
 
 
 def _eliminar_duplicados(df):
@@ -97,7 +97,7 @@ def _limpiar_y_convertir_salarios(df):
     df['salary_before_usd'] = pd.to_numeric(df['salary_before_usd'], errors='coerce')
     df['salary_after_usd'] = pd.to_numeric(df['salary_after_usd'], errors='coerce')
 
-    muestra_df_post_conversion = df.isnull().sum().copy()
+    muestra_df_post_conversion = df.isnull().sum()
 
     if (muestra_df_pre_conversion.equals(muestra_df_post_conversion)):
         print("No se generaron nulos adicionales tras la conversión.")

@@ -92,7 +92,7 @@ def analizar_brecha_habilidades(df):
     brecha_por_pais = df.groupby('country')['skill_gap_index'].mean().sort_values(ascending=False)
 
     print("\nPromedio de Skill Gap Index por País")
-    print(brecha_por_pais.to_string(index=False))
+    print(brecha_por_pais.to_string())
     print(f"\nSe compararon {len(brecha_por_pais)} países.")
 
     pais_critico = brecha_por_pais.idxmax()
