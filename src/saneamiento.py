@@ -1,8 +1,18 @@
+"""Carga, audita y sanea el dataset, incluido el filtrado de outliers."""
+
 import pandas as pd
 from src.outliers import calcular_limites_outliers
 
 
 def cargar_y_mostrar_dataset(csv_base_file_path):
+    """Carga un CSV, muestra un resumen descriptivo y devuelve sus datos.
+
+    Args:
+        csv_base_file_path: Ruta del archivo CSV de entrada.
+
+    Returns:
+        DataFrame cargado desde el archivo.
+    """
     print(f"\nSe carga la fuente de datos desde: {csv_base_file_path}")
     df = pd.read_csv(csv_base_file_path)
     print(f"El dataset contiene {len(df)} filas y {len(df.columns)} columnas.")
@@ -21,14 +31,24 @@ def cargar_y_mostrar_dataset(csv_base_file_path):
 
 
 def analizar_vacios_y_duplicados(df):
+    """Muestra los valores nulos por columna y el total de filas duplicadas.
+
+    Args:
+        df: DataFrame que se auditará.
+    """
     print("\nSe revisan los valores faltantes y las filas repetidas.")
     print("Conteo de valores nulos por columna:")
-    print(df.isnull().sum().to_string())
+    print(df.isnull().sum().to_string(index=False))
 
     print("\nNúmero de filas repetidas:", df.duplicated().sum())
 
 
 def identificar_inconsistencias_categoricas(df):
+    """Muestra frecuencias de categorías y formatos iniciales de salarios.
+
+    Args:
+        df: DataFrame cuyas columnas categóricas y salarios se inspeccionarán.
+    """
     object_columns = [
         col for col in df.select_dtypes(include=['object']).columns
         if col not in ['salary_before_usd', 'salary_after_usd']
@@ -37,16 +57,17 @@ def identificar_inconsistencias_categoricas(df):
 
     for col in object_columns:
         print(f"\nFrecuencia de categorías para {col}:")
-        print(df[col].value_counts(normalize=True).to_string())
+        print(df[col].value_counts(normalize=True).to_string(index=False))
 
     print("\nSe analiza el primer carácter de salary_before_usd y salary_after_usd para detectar formatos inconsistentes.")
     for col in ['salary_before_usd', 'salary_after_usd']:
         primer_caracter = df[col].astype('string').str.strip().str[0].fillna('NA')
         print(f"\nConteo de registros por primer carácter en {col}:")
-        print(primer_caracter.value_counts(dropna=False).to_string())
+        print(primer_caracter.value_counts(dropna=False).to_string(index=False))
 
 
 def _eliminar_duplicados(df):
+    """Elimina filas completamente duplicadas y devuelve el DataFrame resultante."""
     filas_iniciales = len(df)
     df = df.drop_duplicates()
     print(f"\nSe eliminaron {filas_iniciales - len(df)} filas repetidas.")
@@ -54,6 +75,7 @@ def _eliminar_duplicados(df):
 
 
 def _normalizar_columnas_texto(df):
+    """Quita espacios en columnas de texto y normaliza la industria en minúsculas."""
     print("Se quitan espacios al inicio y al final en todas las columnas de texto.")
     object_columns = df.select_dtypes(include=['object']).columns
     for col in object_columns:
@@ -65,6 +87,7 @@ def _normalizar_columnas_texto(df):
 
 
 def _limpiar_y_convertir_salarios(df):
+    """Limpia símbolos salariales y convierte ambas columnas a valores numéricos."""
     muestra_df_pre_conversion = df.isnull().sum().copy()
 
     print("Se limpian los símbolos de los salarios y se convierten sus valores a formato numérico.")
@@ -85,6 +108,7 @@ def _limpiar_y_convertir_salarios(df):
 
 
 def _imputar_industria_y_riesgo(df):
+    """Completa industrias faltantes y riesgo con el promedio por puesto e industria."""
     faltantes_industry = int(df['industry'].isna().sum())
     print(f"Se completan {faltantes_industry} industrias faltantes con 'unknown'.")
     df['industry'] = df['industry'].fillna('unknown')
@@ -98,6 +122,7 @@ def _imputar_industria_y_riesgo(df):
 
 
 def _imputar_salarios_por_grupo(df):
+    """Imputa salarios faltantes con la mediana por puesto e industria."""
     print("Se imputan los salarios faltantes con la mediana del mismo puesto y la misma industria.")
     df['salary_before_usd'] = df['salary_before_usd'].fillna(
         df.groupby(['job_role', 'industry'])['salary_before_usd'].transform('median')
@@ -110,6 +135,7 @@ def _imputar_salarios_por_grupo(df):
 
 
 def _reportar_estado_limpieza(df):
+    """Informa cuántos valores nulos permanecen en el DataFrame."""
     nulos_restantes = df.isnull().sum().sum()
 
     if nulos_restantes == 0:
@@ -119,6 +145,14 @@ def _reportar_estado_limpieza(df):
 
 
 def limpiar_dataset(df):
+    """Aplica en orden las etapas de saneamiento al DataFrame.
+
+    Args:
+        df: DataFrame con las columnas esperadas por las etapas de limpieza.
+
+    Returns:
+        DataFrame sin duplicados, con texto normalizado e imputaciones aplicadas.
+    """
     print("\nEjecutando modulo de limpieza del dataset...")
     df = _eliminar_duplicados(df)
     print()
@@ -136,6 +170,14 @@ def limpiar_dataset(df):
 
 
 def filtrar_outliers(df):
+    """Filtra salarios fuera de los límites de Tukey y conserva una copia original.
+
+    Args:
+        df: DataFrame saneado con puesto, país y salarios numéricos.
+
+    Returns:
+        Tupla con el DataFrame filtrado y una copia previa al filtrado.
+    """
     print("\nEjecutando modulo de limpieza de outliers...")
     filas_iniciales = len(df)
     df_outliers = df.copy()

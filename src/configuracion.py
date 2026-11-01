@@ -1,3 +1,5 @@
+"""Define rutas del proyecto para datos de entrada y archivos de salida."""
+
 from pathlib import Path
 
 

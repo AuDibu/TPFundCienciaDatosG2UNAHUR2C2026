@@ -1,8 +1,15 @@
+"""Analiza variaciones salariales y riesgos según factores del empleo."""
+
 import numpy as np
 import pandas as pd
 
 
 def analizar_variacion_salarial_por_pais(df):
+    """Compara la mediana salarial post IA de 2020 y 2026 para cada país.
+
+    Args:
+        df: DataFrame con país, año y salario post IA.
+    """
     print("\nSe compara el salario mediano post IA de 2020 y 2026.")
     
     salarios = (
@@ -32,6 +39,13 @@ def analizar_variacion_salarial_por_pais(df):
 
 
 def _analizar_indicador_por_factibilidad_remota(df, columna, nombre_indicador):
+    """Compara un indicador en 2020 y 2026 por rango de trabajo remoto.
+
+    Args:
+        df: DataFrame con año, factibilidad remota y el indicador.
+        columna: Nombre de la columna numérica que se analizará.
+        nombre_indicador: Etiqueta descriptiva usada en el reporte.
+    """
     rangos = ['0-25', '25-50', '50-75', '75-100']
     years = [2020, 2026]
     df_con_rangos = df.loc[
@@ -64,6 +78,11 @@ def _analizar_indicador_por_factibilidad_remota(df, columna, nombre_indicador):
 
 
 def analizar_reemplazo_ia_por_factibilidad_remota(df):
+    """Muestra el reemplazo por IA promedio según factibilidad remota.
+
+    Args:
+        df: DataFrame con año, factibilidad remota y puntaje de reemplazo.
+    """
     _analizar_indicador_por_factibilidad_remota(
         df,
         'ai_replacement_score',
@@ -72,6 +91,11 @@ def analizar_reemplazo_ia_por_factibilidad_remota(df):
 
 
 def analizar_riesgo_automatizacion_por_factibilidad_remota(df):
+    """Muestra el riesgo de automatización según factibilidad remota.
+
+    Args:
+        df: DataFrame con año, factibilidad remota y riesgo de automatización.
+    """
     _analizar_indicador_por_factibilidad_remota(
         df,
         'automation_risk_percent',

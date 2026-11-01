@@ -1,9 +1,16 @@
+"""Realiza análisis exploratorios de salarios, habilidades y valores atípicos."""
+
 import numpy as np
 import pandas as pd
 from src.outliers import calcular_limites_outliers
 
 
 def _construir_tabla_volatilidad(grupos):
+    """Obtiene rangos y varianzas salariales de los grupos recibidos.
+
+    Returns:
+        DataFrame con métricas pre y post IA, indexado por las claves de grupo.
+    """
     varianzas = grupos[['salary_before_usd', 'salary_after_usd']].var()
     maximos = grupos[['salary_before_usd', 'salary_after_usd']].max()
     minimos = grupos[['salary_before_usd', 'salary_after_usd']].min()
@@ -18,27 +25,36 @@ def _construir_tabla_volatilidad(grupos):
 
 
 def _calcular_variaciones_porcentuales(volatilidad_df):
+    """Agrega variaciones porcentuales del rango y la varianza al DataFrame."""
     volatilidad_df['var_porcentual_rango'] = ((volatilidad_df['rango_post_ia'] - volatilidad_df['rango_pre_ia']) / volatilidad_df['rango_pre_ia']) * 100
     volatilidad_df['var_porcentual_varianza'] = ((volatilidad_df['var_post_ia'] - volatilidad_df['var_pre_ia']) / volatilidad_df['var_pre_ia']) * 100
     return volatilidad_df
 
 
 def _reemplazar_inf_por_nan(df):
+    """Reemplaza valores infinitos por nulos."""
     return df.replace([np.inf, -np.inf], np.nan)
 
 
 def _obtener_tabla_variacion(volatilidad_df):
+    """Selecciona país, puesto y variaciones porcentuales para el reporte."""
     columnas_variacion = ['job_role', 'country', 'var_porcentual_rango', 'var_porcentual_varianza']
     return volatilidad_df[columnas_variacion]
 
 
 def _calcular_promedios_impacto(tabla_variacion):
+    """Calcula los promedios de variación del rango y la varianza."""
     promedio_var_rango = tabla_variacion['var_porcentual_rango'].mean()
     promedio_var_varianza = tabla_variacion['var_porcentual_varianza'].mean()
     return promedio_var_rango, promedio_var_varianza
 
 
 def calcular_volatilidad_ingresos(df):
+    """Compara rango y varianza de salarios pre y post IA por puesto y país.
+
+    Args:
+        df: DataFrame con puesto, país y salarios antes y después de la IA.
+    """
     print("\nSe compara la variación de los salarios antes y después de la IA.")
     print("Para observar puestos similares dentro de cada mercado, se agrupa por puesto y país.")
     grupos = df.groupby(['job_role', 'country'])
@@ -67,11 +83,16 @@ def calcular_volatilidad_ingresos(df):
 
 
 def analizar_brecha_habilidades(df):
+    """Muestra el promedio de brecha de habilidades por país y el máximo.
+
+    Args:
+        df: DataFrame con las columnas ``country`` y ``skill_gap_index``.
+    """
     print("\nSe calcula el promedio de skill_gap_index para cada país.")
     brecha_por_pais = df.groupby('country')['skill_gap_index'].mean().sort_values(ascending=False)
 
     print("\nPromedio de Skill Gap Index por País")
-    print(brecha_por_pais.to_string())
+    print(brecha_por_pais.to_string(index=False))
     print(f"\nSe compararon {len(brecha_por_pais)} países.")
 
     pais_critico = brecha_por_pais.idxmax()
@@ -81,6 +102,11 @@ def analizar_brecha_habilidades(df):
 
 
 def detectar_outliers(df_outliers):
+    """Identifica y muestra salarios fuera de los límites de Tukey por grupo.
+
+    Args:
+        df_outliers: DataFrame previo al filtrado, con puestos, países y salarios.
+    """
     print("\nSe buscan salarios que se alejan del rango habitual de su puesto y país.")
     print("Para definir los límites se usa 1,5 veces el rango intercuartílico, conocido como criterio de Tukey.")
     for col in ['salary_before_usd', 'salary_after_usd']:

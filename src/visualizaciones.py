@@ -1,9 +1,12 @@
+"""Prepara y guarda los gráficos de la fase de visualización."""
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 
 def _preparar_salario_promedio_anual(df):
+    """Agrupa por año y calcula el salario post IA promedio."""
     return (
         df.groupby('year')['salary_after_usd']
         .mean()
@@ -13,6 +16,7 @@ def _preparar_salario_promedio_anual(df):
 
 
 def _guardar_grafico_evolucion_salarios(tabla_anual, ruta_output):
+    """Guarda el gráfico de evolución salarial y devuelve su ruta."""
     ruta_archivo = Path(ruta_output) / 'evolucion_salarial_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -44,10 +48,12 @@ def _guardar_grafico_evolucion_salarios(tabla_anual, ruta_output):
 
 
 def _preparar_distribucion_riesgo_automatizacion(df):
+    """Cuenta las observaciones de cada categoría de riesgo de automatización."""
     return df['automation_risk_category'].value_counts().sort_values(ascending=False)
 
 
 def _guardar_grafico_distribucion_riesgo(distribucion_riesgo, ruta_output):
+    """Guarda el gráfico circular de riesgo y devuelve su ruta."""
     ruta_archivo = Path(ruta_output) / 'distribucion_riesgo_automatizacion_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -72,6 +78,7 @@ def _guardar_grafico_distribucion_riesgo(distribucion_riesgo, ruta_output):
 
 
 def _preparar_adopcion_ia_por_pais(df):
+    """Calcula el nivel promedio de adopción de IA por país."""
     return (
         df.groupby('country')['ai_adoption_level']
         .mean()
@@ -80,6 +87,7 @@ def _preparar_adopcion_ia_por_pais(df):
 
 
 def _guardar_grafico_barras_adopcion(adopcion_por_pais, ruta_output):
+    """Guarda el gráfico de adopción de IA por país y devuelve su ruta."""
     ruta_archivo = Path(ruta_output) / 'adopcion_ia_por_pais_finanzas.png'
 
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -121,6 +129,15 @@ def _guardar_grafico_barras_adopcion(adopcion_por_pais, ruta_output):
 
 
 def generar_visualizaciones_fase_iii(df, ruta_output):
+    """Genera y guarda los gráficos de salarios, riesgo y adopción de IA.
+
+    Args:
+        df: DataFrame del sector con las columnas usadas por los gráficos.
+        ruta_output: Directorio de destino para los archivos PNG.
+
+    Returns:
+        Lista de rutas de los gráficos generados; queda vacía si no hay datos.
+    """
     rutas_generadas = []
 
     print('\nSe generan visualizaciones de Fase III para el sector Finanzas.')

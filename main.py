@@ -1,3 +1,5 @@
+"""Orquesta el análisis del dataset y la generación del reporte final."""
+
 from contextlib import redirect_stdout
 from io import StringIO
 import sys
@@ -24,6 +26,11 @@ from src.reflexion import (
 
 
 def main():
+    """Ejecuta el análisis y guarda su salida en ``data/output/report.txt``.
+
+    También muestra el reporte en la consola. Los errores de análisis o escritura
+    se propagan al llamador.
+    """
     salida = StringIO()
     stdout_original = sys.stdout
     RUTA_OUTPUT.mkdir(parents=True, exist_ok=True)
