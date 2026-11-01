@@ -75,14 +75,14 @@ def _eliminar_duplicados(df):
 
 
 def _normalizar_columnas_texto(df):
-    """Quita espacios en columnas de texto y normaliza la industria en minúsculas."""
-    print("Se quitan espacios al inicio y al final en todas las columnas de texto.")
-    object_columns = df.select_dtypes(include=['object']).columns
+    """Quita espacios y convierte a minúsculas el texto, excepto las columnas salariales."""
+    print("Se quitan espacios y se convierten a minúsculas las columnas de texto, excepto los salarios.")
+    object_columns = [
+        col for col in df.select_dtypes(include=['object']).columns
+        if col not in ['salary_before_usd', 'salary_after_usd']
+    ]
     for col in object_columns:
-        df[col] = df[col].apply(lambda valor: valor.strip() if isinstance(valor, str) else valor)
-
-    print("Se normalizan los nombres de las industrias para unificar mayúsculas, minúsculas y espacios.")
-    df['industry'] = df['industry'].str.lower().str.strip()
+        df[col] = df[col].str.strip().str.lower()
     return df
 
 
