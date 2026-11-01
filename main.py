@@ -24,7 +24,6 @@ from src.reflexion import (
     analizar_variacion_salarial_por_pais,
 )
 
-
 def main():
     """Ejecuta el análisis y guarda su salida en ``data/output/report.txt``.
 
@@ -69,16 +68,16 @@ def main():
 # *Estrategia de limpieza:*
 #
 # - Repetidos:
-#     - Se dejara una fila única por cada repetido
+#     - Se dejará una fila única por cada repetido
 # - Conflictos en columnas categóricas:
-#     - A todas las columnas string se le aplicara un trim
-#     - Industry sera pasado a solo minúscula de manera general
-#     - Salary_before_usd y salary_after_usd seran convertidos a float
-# - Vacios:
-#     - Los casos vacios de Industry se completaran con "unknown"
-#     - Los vacios de automation_risk_percent seran completados analizando el promedio a nivel job_role/industry.
-#     - Los vacios de salary_before_usd y salary_after_usd seran completados analizando la mediana a nivel job_role/industry.
-#       - Se usa la mediana ya que los sueldos muy altos o muy bajos harian del promedio un valor poco representativo.
+#     - A todas las columnas string se le aplicará un trim
+#     - Los campos string serán pasados a solo minúscula de manera general
+#     - Salary_before_usd y salary_after_usd serán convertidos a float
+# - Vacíos:
+#     - Los casos vacíos de Industry se completarán con "unknown"
+#     - Los vacíos de automation_risk_percent serán completados analizando el promedio a nivel job_role/industry.
+#     - Los vacíos de salary_before_usd y salary_after_usd serán completados analizando la mediana a nivel job_role/industry.
+#       - Se usa la mediana ya que los sueldos muy altos o muy bajos harían del promedio un valor poco representativo.
 #
 """)
             df = limpiar_dataset(df)
@@ -103,7 +102,7 @@ def main():
 #
 # #### Volatilidad de Ingresos
 #
-# En este caso se agrupo por job_role y country, considerando el mismo puesto dentro del mercado local. Posteriormente se obtuvo el porcentaje de incremento o decremento entre los valores pre y post tanto de rango como varianza. Dichos valores fueron promediados para tener un indicador general del estado del mercado.
+# En este caso se agrupó por job_role y country, considerando el mismo puesto dentro del mercado local. Posteriormente se obtuvo el porcentaje de incremento o decremento entre los valores pre y post tanto de rango como de varianza. Dichos valores fueron promediados para tener un indicador general del estado del mercado.
 """)
             calcular_volatilidad_ingresos(df)
             print()
@@ -113,7 +112,7 @@ def main():
             print()
 
             print("""\n# #### Detección de outliers
-# Para detectar los outliers se usa IQR. Se segmenta por job_role y country para que el rango comprenda puestos similares dentro la misma economia local.
+# Para detectar los outliers se usa IQR. Se segmenta por job_role y country para que el rango comprenda puestos similares dentro de la misma economía local.
 # En resumen, el IQR representa el rango central de los datos obtenido a partir de restar el cuartil 25 al cuartil 75. No representa el punto medio sino la distancia entre el Q25 y Q75.
 # Posteriormente podemos usar dicha distancia multiplicada por 1,5 para establecer topes inferiores y superiores (conocidos como barreras de Tukey) para determinar los outliers.
 # Aquellos outliers detectados fueron eliminados en un paso previo. En el bloque siguiente se aprecia la detección en detalle de los mismos usando una copia de respaldo previo a dicho tratamiento.
@@ -153,11 +152,11 @@ def main():
 # una disminución porcentual del salario entre 2020 y 2026 en la mayoría de los casos
 # Se aprecian casos donde hubo una evolución positiva del salario, así como también una falta de uniformidad
 # en la disminución salarial.
-# Se podria relacionar la apareción de los LLM con una disminución de los salarios y el costo propio de la
+# Se podría relacionar la aparición de los LLM con una disminución de los salarios y el costo propio de la
 # tecnología lleva a un redireccionamiento de recursos destinado a la misma además de una mayor demanda de productividad
-# hacia los dev al contar con esta herraminta
+# hacia los desarrolladores al contar con esta herramienta
 # Sin embargo, si bien la disminución del salario es apreciable es importante recordar que 
-# es solo uno de los multiples factores presentes en la actualidad, por lo que no se le podria atribuir la totalidad de la culpa.
+# es solo uno de los múltiples factores presentes en la actualidad, por lo que no se le podría atribuir la totalidad de la culpa.
 """)
             
             print("""
@@ -172,7 +171,7 @@ def main():
 # Tras analizar los datos, tanto para ai_replacement_score como para automation_risk_percent
 # se observa una disminución en ambos indicadores de riesgo para la mayoría de brackets de factibilidad remota.
 # Sin embargo se aprecia un aumento en ambos para el bracket de 25-50, lo que indica mayor vulnerabilidad en estos puestos.
-# En general se podria decir que aquellos puestos completamente presenciales y aquellos que apenas requieren de la presencia
+# En general se podría decir que aquellos puestos completamente presenciales y aquellos que apenas requieren de la presencia
 # del personal quedaron más protegidos.
 """)
             
